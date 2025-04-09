@@ -26,6 +26,19 @@ public class SteeringBehavior : MonoBehaviour
         // Assignment 1: If a single target was set, move to that target
         //                If a path was set, follow that path ("tightly")
 
+        if (target == transform.position)
+        {
+            return;
+        }
+
+        Vector3 dist = target - transform.position;
+        float targetAngle = Vector3.SignedAngle(transform.position, target, Vector3.up);
+        float turnVel = targetAngle < transform.eulerAngles.z ? transform.eulerAngles.z - targetAngle : targetAngle - transform.eulerAngles.z;
+        // float turnVel = targetAngle;
+        kinematic.SetDesiredRotationalVelocity(turnVel * Time.deltaTime * 100);
+        kinematic.SetDesiredSpeed(dist.magnitude * Time.deltaTime * 100);
+
+
         // you can use kinematic.SetDesiredSpeed(...) and kinematic.SetDesiredRotationalVelocity(...)
         //    to "request" acceleration/decceleration to a target speed/rotational velocity
     }
