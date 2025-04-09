@@ -32,11 +32,23 @@ public class SteeringBehavior : MonoBehaviour
         }
 
         Vector3 dist = target - transform.position;
-        float targetAngle = Vector3.SignedAngle(transform.position, target, Vector3.up);
-        float turnVel = targetAngle < transform.eulerAngles.z ? transform.eulerAngles.z - targetAngle : targetAngle - transform.eulerAngles.z;
-        // float turnVel = targetAngle;
-        kinematic.SetDesiredRotationalVelocity(turnVel * Time.deltaTime * 100);
-        kinematic.SetDesiredSpeed(dist.magnitude * Time.deltaTime * 100);
+
+        if (dist.magnitude < 1)
+        {
+            // reached target
+            return;
+        }
+        else if (dist.magnitude < 5)
+        {
+            kinematic.SetDesiredSpeed(kinematic.GetMaxSpeed() * 4 * Time.deltaTime);
+            kinematic.SetDesiredRotationalVelocity(0);
+            return;
+        }
+        // float targetAngle = Vector3.SignedAngle(transform.position, target, Vector3.up);
+        float targetAngle = Vector3.SignedAngle(transform.forward, dist.normalized, Vector3.up);
+        // float turnVel = targetAngle < transform.eulerAngles.z ? transform.eulerAngles.z - targetAngle : targetAngle - transform.eulerAngles.z;
+        kinematic.SetDesiredRotationalVelocity( (kinematic.desired_rotational_velocity / 2) + targetAngle * Time.deltaTime * 100);
+        kinematic.SetDesiredSpeed(dist.sqrMagnitude * Time.deltaTime);
 
 
         // you can use kinematic.SetDesiredSpeed(...) and kinematic.SetDesiredRotationalVelocity(...)
