@@ -53,7 +53,9 @@ public class SteeringBehavior : MonoBehaviour
 
         float targetAngle = Vector3.SignedAngle(transform.forward, dist.normalized, Vector3.up);
 
-        kinematic.SetDesiredRotationalVelocity( (kinematic.desired_rotational_velocity / 2) + targetAngle * Time.deltaTime * 100);
+
+
+        kinematic.SetDesiredRotationalVelocity( targetAngle * Time.deltaTime * 1000);
         kinematic.SetDesiredSpeed(Mathf.Max(dist.sqrMagnitude * Time.deltaTime * 5, 3) );
 
 
