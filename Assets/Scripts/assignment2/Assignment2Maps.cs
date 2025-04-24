@@ -131,6 +131,13 @@ public class Assignment2Maps : MapCollection
             EventBus.SetGraph(g);
             return;
         }
+        
+        // custom maps
+        if (which == 3)
+        {
+            Graph g = new Graph();
+            List<GraphNode> nodes = new List<GraphNode>();
+        }
 
 
 

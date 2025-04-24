@@ -23,11 +23,15 @@ public class PathFinder : MonoBehaviour
         GraphNode prev = null;
         GraphNode curr = null;
         
-        // node, successor, total heuristic, dist from successor
+        // node, total heuristic, dist from successor
         List<Tuple<GraphNode, float, float>> q = new List<Tuple<GraphNode, float, float>>();
         Dictionary<GraphNode, GraphNode> visited = new Dictionary<GraphNode, GraphNode>();
         
+        // this set is specifically for getting open nodes fast
+        HashSet<GraphNode> frontier = new HashSet<GraphNode>();
+        
         q.Add(new Tuple<GraphNode, float, float>(start, (target - start.GetCenter()).magnitude, 0));
+        frontier.Add(start);
 
         while (q.Count > 0)
         {
@@ -35,11 +39,14 @@ public class PathFinder : MonoBehaviour
             curr = q[q.Count - 1].Item1;
             float parentG = q[q.Count - 1].Item3;
             q.RemoveAt(q.Count - 1);
+            frontier.Remove(curr);
 
-            visited.TryAdd(curr, prev);
+            if (!visited.ContainsKey(curr))
+            {
+                visited[curr] = prev;
+            }
+            
             nodesExpanded++;
-            
-            
             
             // check if dest is in frontier
             if (curr == destination)
@@ -56,7 +63,12 @@ public class PathFinder : MonoBehaviour
             // get all neighbors of curr node
             foreach (GraphNeighbor neighbor in curr.GetNeighbors())
             {
-                if (!visited.ContainsKey(neighbor.GetNode()))
+                if (visited.ContainsKey(neighbor.GetNode()))
+                {
+                    continue;
+                }
+                
+                if (!frontier.Contains(neighbor.GetNode()))
                 {
                     float gScore = parentG + (curr.GetCenter() - neighbor.GetNode().GetCenter()).magnitude;
                     float hScore = (target - neighbor.GetNode().GetCenter()).magnitude;
@@ -67,7 +79,7 @@ public class PathFinder : MonoBehaviour
                     
                     // push neighbor to frontier
                     Push(q, distNode);
-                    visited.TryAdd(neighbor.GetNode(), curr);
+                    frontier.Add(neighbor.GetNode());
                 }
             }
             print(q.Count);
@@ -139,11 +151,5 @@ public class PathFinder : MonoBehaviour
             Debug.Log("found path of length " + path.Count + " expanded " + expanded + " nodes, out of: " + graph.all_nodes.Count);
             EventBus.SetPath(path);
         }
-        
-
     }
-
-    
-
- 
 }

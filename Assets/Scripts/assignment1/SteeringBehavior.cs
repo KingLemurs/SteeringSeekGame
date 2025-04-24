@@ -7,6 +7,7 @@ public class SteeringBehavior : MonoBehaviour
     public Vector3 target;
     public KinematicBehavior kinematic;
     public List<Vector3> path;
+    public float minSpeed = 5;
     // you can use this label to show debug information,
     // like the distance to the (next) target
     public TextMeshProUGUI label;
@@ -34,9 +35,9 @@ public class SteeringBehavior : MonoBehaviour
         }
         
         Vector3 dist = target - transform.position;
-        label.text = $"dist: {dist.magnitude}";
+        // label.text = $"dist: {dist.magnitude}";
 
-        if (dist.magnitude < 0.7f)
+        if (dist.magnitude < 1.5f)
         {
             // reached target
             kinematic.SetDesiredSpeed(0);
@@ -60,7 +61,8 @@ public class SteeringBehavior : MonoBehaviour
         }
 
         kinematic.SetDesiredRotationalVelocity( targetAngle * Time.deltaTime * 1000);
-        kinematic.SetDesiredSpeed(Mathf.Max(dist.sqrMagnitude * Time.deltaTime * 5, 3) );
+        kinematic.SetDesiredSpeed(Mathf.Max(dist.sqrMagnitude * Time.deltaTime * 5, minSpeed) );
+        // kinematic.SetDesiredSpeed(dist.sqrMagnitude * Time.deltaTime * 20);
 
 
         // you can use kinematic.SetDesiredSpeed(...) and kinematic.SetDesiredRotationalVelocity(...)
