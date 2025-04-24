@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -18,10 +19,78 @@ public class PathFinder : MonoBehaviour
     {
         // Implement A* here
         List<Vector3> path = new List<Vector3>() { target };
+        int nodesExpanded = 0;
+        GraphNode prev = null;
+        GraphNode curr = null;
+        
+        // node, successor, total heuristic, dist from successor
+        List<Tuple<GraphNode, GraphNode, float, float>> q = new List<Tuple<GraphNode, GraphNode, float, float>>();
+        Dictionary<GraphNode, GraphNode> visited = new Dictionary<GraphNode, GraphNode>();
+        
+        q.Add(new Tuple<GraphNode, GraphNode, float, float>(start, null, (target - start.GetCenter()).magnitude, 0));
+
+        while (q.Count > 0)
+        {
+            prev = curr;
+            curr = q[q.Count - 1].Item1;
+            float parentG = q[q.Count - 1].Item4;
+            q.RemoveAt(q.Count - 1);
+
+            visited.TryAdd(curr, prev);
+            nodesExpanded++;
+            
+            
+            
+            // check if dest is in frontier
+            if (curr == destination)
+            {
+                // work backwards from visited hashmap
+                GraphNode pathNode = destination;
+                while (pathNode != null)
+                {
+                    path.Insert(0, pathNode.GetCenter());
+                    pathNode = visited[pathNode];
+                }
+            }
+            
+            // get all neighbors of curr node
+            foreach (GraphNeighbor neighbor in curr.GetNeighbors())
+            {
+                if (!visited.ContainsKey(neighbor.GetNode()))
+                {
+                    float gScore = parentG + (curr.GetCenter() - neighbor.GetNode().GetCenter()).magnitude;
+                    float hScore = (target - neighbor.GetNode().GetCenter()).magnitude;
+                    Tuple<GraphNode, GraphNode, float, float> distNode = new Tuple<GraphNode, GraphNode, float, float>(
+                        neighbor.GetNode(), 
+                        curr,
+                        hScore + gScore,
+                        gScore);
+                    
+                    // push neighbor to frontier
+                    Push(q, distNode);
+                    visited.TryAdd(neighbor.GetNode(), curr);
+                }
+            }
+            print(q.Count);
+        }
 
         // return path and number of nodes expanded
-        return (path, 0);
+        return (path, nodesExpanded);
+    }
 
+    public static void Push(List<Tuple<GraphNode, GraphNode, float, float>> q, Tuple<GraphNode, GraphNode, float, float> curr)
+    {
+        // find where to insert curr (treat q as stack)
+        for (int i = 0; i < q.Count; i++)
+        {
+            if (curr.Item3 >= q[i].Item3)
+            {
+                q.Insert(i, curr);
+                return;
+            }
+        }
+        // if curr has the lowest heuristic, push to end of q
+        q.Add(curr);
     }
 
     public Graph graph;

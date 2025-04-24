@@ -18,6 +18,7 @@ public class SteeringBehavior : MonoBehaviour
         target = transform.position;
         path = null;
         EventBus.OnSetMap += SetMap;
+
     }
 
     // Update is called once per frame
