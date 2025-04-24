@@ -24,16 +24,16 @@ public class PathFinder : MonoBehaviour
         GraphNode curr = null;
         
         // node, successor, total heuristic, dist from successor
-        List<Tuple<GraphNode, GraphNode, float, float>> q = new List<Tuple<GraphNode, GraphNode, float, float>>();
+        List<Tuple<GraphNode, float, float>> q = new List<Tuple<GraphNode, float, float>>();
         Dictionary<GraphNode, GraphNode> visited = new Dictionary<GraphNode, GraphNode>();
         
-        q.Add(new Tuple<GraphNode, GraphNode, float, float>(start, null, (target - start.GetCenter()).magnitude, 0));
+        q.Add(new Tuple<GraphNode, float, float>(start, (target - start.GetCenter()).magnitude, 0));
 
         while (q.Count > 0)
         {
             prev = curr;
             curr = q[q.Count - 1].Item1;
-            float parentG = q[q.Count - 1].Item4;
+            float parentG = q[q.Count - 1].Item3;
             q.RemoveAt(q.Count - 1);
 
             visited.TryAdd(curr, prev);
@@ -60,9 +60,8 @@ public class PathFinder : MonoBehaviour
                 {
                     float gScore = parentG + (curr.GetCenter() - neighbor.GetNode().GetCenter()).magnitude;
                     float hScore = (target - neighbor.GetNode().GetCenter()).magnitude;
-                    Tuple<GraphNode, GraphNode, float, float> distNode = new Tuple<GraphNode, GraphNode, float, float>(
+                    Tuple<GraphNode, float, float> distNode = new Tuple<GraphNode, float, float>(
                         neighbor.GetNode(), 
-                        curr,
                         hScore + gScore,
                         gScore);
                     
@@ -78,12 +77,12 @@ public class PathFinder : MonoBehaviour
         return (path, nodesExpanded);
     }
 
-    public static void Push(List<Tuple<GraphNode, GraphNode, float, float>> q, Tuple<GraphNode, GraphNode, float, float> curr)
+    public static void Push(List<Tuple<GraphNode, float, float>> q, Tuple<GraphNode, float, float> curr)
     {
         // find where to insert curr (treat q as stack)
         for (int i = 0; i < q.Count; i++)
         {
-            if (curr.Item3 >= q[i].Item3)
+            if (curr.Item2 >= q[i].Item2)
             {
                 q.Insert(i, curr);
                 return;
