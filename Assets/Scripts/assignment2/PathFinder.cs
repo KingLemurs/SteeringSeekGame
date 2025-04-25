@@ -74,6 +74,8 @@ public class PathFinder : MonoBehaviour
             foreach (GraphNeighbor neighbor in curr.node.GetNeighbors())
             {
                 bool skip = false;
+                
+                // check if in visited list
                 foreach (var node in visited)
                 {
                     if (neighbor.GetNode() == node.node)
@@ -88,6 +90,7 @@ public class PathFinder : MonoBehaviour
                     continue;
                 }
                 
+                // calculate new heuristics
                 float gScore = curr.gScore + (curr.node.GetCenter() - neighbor.GetNode().GetCenter()).magnitude;
                 float hScore = (neighbor.GetNode().GetCenter() - destination.GetCenter()).magnitude;
                 AStarEntry entry = new AStarEntry(neighbor.GetNode(), curr, neighbor.GetWall().midpoint, gScore,
@@ -119,6 +122,7 @@ public class PathFinder : MonoBehaviour
         return (path, nodesExpanded);
     }
 
+    // to mimic push() operation on a list
     public static void Push(List<AStarEntry> q, AStarEntry curr)
     {
         // find where to insert curr (treat q as stack)
