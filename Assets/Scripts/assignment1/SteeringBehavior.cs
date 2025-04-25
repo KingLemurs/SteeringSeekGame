@@ -63,7 +63,7 @@ public class SteeringBehavior : MonoBehaviour
 
         kinematic.SetDesiredRotationalVelocity( targetAngle * scalar * Time.deltaTime * 1000);
 
-        if (Mathf.Abs(targetAngle - transform.eulerAngles.z) < 10f)
+        if (Mathf.Abs(targetAngle - transform.eulerAngles.z) < 15f)
         {
             kinematic.SetDesiredSpeed(Mathf.Max(dist.sqrMagnitude * Time.deltaTime * 5, minSpeed) );
         }
