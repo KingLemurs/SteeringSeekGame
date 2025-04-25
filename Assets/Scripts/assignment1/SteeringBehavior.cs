@@ -55,13 +55,22 @@ public class SteeringBehavior : MonoBehaviour
 
         float targetAngle = Vector3.SignedAngle(transform.forward, dist.normalized, Vector3.up);
 
+        float scalar = 1;
         if (Mathf.Abs(targetAngle - transform.eulerAngles.z) < 5f)
         {
-            targetAngle *= 0.01f;
+            scalar = 0.01f;
         }
 
-        kinematic.SetDesiredRotationalVelocity( targetAngle * Time.deltaTime * 1000);
-        kinematic.SetDesiredSpeed(Mathf.Max(dist.sqrMagnitude * Time.deltaTime * 5, minSpeed) );
+        kinematic.SetDesiredRotationalVelocity( targetAngle * scalar * Time.deltaTime * 1000);
+
+        if (Mathf.Abs(targetAngle - transform.eulerAngles.z) < 10f)
+        {
+            kinematic.SetDesiredSpeed(Mathf.Max(dist.sqrMagnitude * Time.deltaTime * 5, minSpeed) );
+        }
+        else
+        {
+            kinematic.SetDesiredSpeed(0);
+        }
         // kinematic.SetDesiredSpeed(dist.sqrMagnitude * Time.deltaTime * 20);
 
 
