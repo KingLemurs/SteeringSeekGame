@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class PathFinder : MonoBehaviour
 {
@@ -15,86 +16,115 @@ public class PathFinder : MonoBehaviour
     // efficient
     //
     // Take a look at StandaloneTests.cs for some test cases
+
+    public class AStarEntry
+    {
+        public GraphNode node;
+        public AStarEntry from;
+        public Vector3 midPoint;
+        public float gScore;
+        public float fScore;
+        
+        public AStarEntry(GraphNode node, AStarEntry from, Vector3 midPoint, float gScore, float fScore)
+        {
+            this.node = node;
+            this.from = from;
+            this.midPoint = midPoint;
+            this.gScore = gScore;
+            this.fScore = fScore;
+        }
+    }
     public static (List<Vector3>, int) AStar(GraphNode start, GraphNode destination, Vector3 target)
     {
         // Implement A* here
         List<Vector3> path = new List<Vector3>() { target };
         int nodesExpanded = 0;
-        GraphNode prev = null;
-        GraphNode curr = null;
+        AStarEntry curr = null;
         
-        // node, total heuristic, dist from successor
-        List<Tuple<GraphNode, float, float>> q = new List<Tuple<GraphNode, float, float>>();
-        Dictionary<GraphNode, GraphNode> visited = new Dictionary<GraphNode, GraphNode>();
-        
-        // this set is specifically for getting open nodes fast
-        HashSet<GraphNode> frontier = new HashSet<GraphNode>();
-        
-        q.Add(new Tuple<GraphNode, float, float>(start, (target - start.GetCenter()).magnitude, 0));
-        frontier.Add(start);
+        // node, total heuristic, g score
+        List<AStarEntry> q = new List<AStarEntry>();
+        List<AStarEntry> visited = new List<AStarEntry>();
+
+        AStarEntry startEntry = new AStarEntry(start, null, start.GetCenter(), 0,
+            (start.GetCenter() - destination.GetCenter()).magnitude);
+        q.Add(startEntry);
 
         while (q.Count > 0)
         {
-            prev = curr;
-            curr = q[q.Count - 1].Item1;
-            float parentG = q[q.Count - 1].Item3;
+            curr = q[^1];
             q.RemoveAt(q.Count - 1);
-            frontier.Remove(curr);
-
-            if (!visited.ContainsKey(curr))
-            {
-                visited[curr] = prev;
-            }
-            
+            visited.Add(curr);
             nodesExpanded++;
             
             // check if dest is in frontier
-            if (curr == destination)
+            if (curr.node == destination)
             {
                 // work backwards from visited hashmap
-                GraphNode pathNode = destination;
+                AStarEntry pathNode = curr;
                 while (pathNode != null)
                 {
-                    path.Insert(0, pathNode.GetCenter());
-                    pathNode = visited[pathNode];
+                    path.Insert(0, pathNode.midPoint);
+                    pathNode = pathNode.from;
                 }
+
+                break;
             }
             
             // get all neighbors of curr node
-            foreach (GraphNeighbor neighbor in curr.GetNeighbors())
+            foreach (GraphNeighbor neighbor in curr.node.GetNeighbors())
             {
-                if (visited.ContainsKey(neighbor.GetNode()))
+                bool skip = false;
+                foreach (var node in visited)
+                {
+                    if (neighbor.GetNode() == node.node)
+                    {
+                        skip = true;
+                        break;
+                    } 
+                }
+
+                if (skip)
                 {
                     continue;
                 }
                 
-                if (!frontier.Contains(neighbor.GetNode()))
+                float gScore = curr.gScore + (curr.node.GetCenter() - neighbor.GetNode().GetCenter()).magnitude;
+                float hScore = (neighbor.GetNode().GetCenter() - destination.GetCenter()).magnitude;
+                AStarEntry entry = new AStarEntry(neighbor.GetNode(), curr, neighbor.GetWall().midpoint, gScore,
+                    gScore + hScore);
+
+                bool shouldAdd = true;
+                
+                // if child already in frontier
+                foreach (var node in q)
                 {
-                    float gScore = parentG + (curr.GetCenter() - neighbor.GetNode().GetCenter()).magnitude;
-                    float hScore = (target - neighbor.GetNode().GetCenter()).magnitude;
-                    Tuple<GraphNode, float, float> distNode = new Tuple<GraphNode, float, float>(
-                        neighbor.GetNode(), 
-                        hScore + gScore,
-                        gScore);
-                    
+                    if (neighbor.GetNode() == node.node && gScore >= node.gScore)
+                    {
+                        shouldAdd = false;
+                        break;
+                    }
+                }
+
+                if (shouldAdd)
+                {
                     // push neighbor to frontier
-                    Push(q, distNode);
-                    frontier.Add(neighbor.GetNode());
+                    Push(q, entry);
                 }
             }
             print(q.Count);
+            print(visited);
         }
 
         // return path and number of nodes expanded
         return (path, nodesExpanded);
     }
 
-    public static void Push(List<Tuple<GraphNode, float, float>> q, Tuple<GraphNode, float, float> curr)
+    public static void Push(List<AStarEntry> q, AStarEntry curr)
     {
         // find where to insert curr (treat q as stack)
         for (int i = 0; i < q.Count; i++)
         {
-            if (curr.Item2 >= q[i].Item2)
+            if (curr.fScore > q[i].fScore)
             {
                 q.Insert(i, curr);
                 return;
@@ -102,6 +132,10 @@ public class PathFinder : MonoBehaviour
         }
         // if curr has the lowest heuristic, push to end of q
         q.Add(curr);
+        foreach (var node in q)
+        {
+            print(node.fScore);
+        }
     }
 
     public Graph graph;

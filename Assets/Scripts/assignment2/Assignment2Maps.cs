@@ -35,6 +35,9 @@ public class Assignment2Maps : MapCollection
             // Don't forget to call:
             // EventBus.SetMap(g.outline);
             // EventBus.SetGraph(g);
+            
+            Graph g = new Graph();
+            List<GraphNode> nodes = new List<GraphNode>();
         }
 
         // .. maps 3-7 are available for your own test cases
@@ -131,14 +134,6 @@ public class Assignment2Maps : MapCollection
             EventBus.SetGraph(g);
             return;
         }
-        
-        // custom maps
-        if (which == 3)
-        {
-            Graph g = new Graph();
-            List<GraphNode> nodes = new List<GraphNode>();
-        }
-
 
 
         if (which == 8)
