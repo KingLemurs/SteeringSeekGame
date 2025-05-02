@@ -2042,7 +2042,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotational_velocity: 0
   desired_rotational_velocity: 0
-  max_rotational_velocity: 2500
+  max_rotational_velocity: 100
   speed: 0
   desired_speed: 0
   max_speed: 25

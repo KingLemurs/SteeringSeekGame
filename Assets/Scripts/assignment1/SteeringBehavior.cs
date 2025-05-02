@@ -42,12 +42,10 @@ public class SteeringBehavior : MonoBehaviour
             // reached target
             kinematic.SetDesiredSpeed(0);
             kinematic.SetDesiredRotationalVelocity(0);
-            print("waht");
 
             if (path != null && path.Count > 0)
             {
                 path.RemoveAt(0);
-                print("hi");
             }
 
             return;

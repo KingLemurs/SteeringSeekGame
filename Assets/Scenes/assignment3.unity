@@ -2035,6 +2035,7 @@ GameObject:
   - component: {fileID: 1006009575}
   - component: {fileID: 1006009576}
   - component: {fileID: 1006009577}
+  - component: {fileID: 1006009578}
   m_Layer: 0
   m_Name: car
   m_TagString: Untagged
@@ -2056,14 +2057,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotational_velocity: 0
   desired_rotational_velocity: 0
-  max_rotational_velocity: 15
+  max_rotational_velocity: 100
   speed: 0
-  desired_speed: 5
+  desired_speed: 0
   max_speed: 25
-  linear_acceleration: 2
-  rotational_acceleration: 5
-  holonomic: 0
-  nonholonomic_factor: 3
+  linear_acceleration: 20
+  rotational_acceleration: 500
+  holonomic: 1
+  nonholonomic_factor: 7
   start_position: {x: 0, y: 0, z: 0}
   start_rotation: {x: 0, y: 0, z: 0, w: 0}
   map: {fileID: 1047158}
@@ -2171,6 +2172,7 @@ MonoBehaviour:
   target: {x: 0, y: 0, z: 0}
   kinematic: {fileID: 0}
   path: []
+  minSpeed: 5
   label: {fileID: 0}
 --- !u!114 &1006009576
 MonoBehaviour:
@@ -2197,6 +2199,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   breadcrumb: {fileID: 6849579715085819137, guid: a731c2a36b7bf29428513edd510e800a, type: 3}
+--- !u!114 &1006009578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006009569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 823787935aabf8d41afdbdcb4dba56f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  steering: {fileID: 1006009575}
 --- !u!1 &1130499559
 GameObject:
   m_ObjectHideFlags: 0
